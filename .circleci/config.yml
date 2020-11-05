@@ -14,9 +14,6 @@ jobs:
       - run:
           command: ./manage.py test
           name: Test
-      - run:
-          command: ./manage.py runserver
-          name: Run Server
 
 
 workflows:
