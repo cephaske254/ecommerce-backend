@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "django_inlinecss",
     "rest_framework",
+    "django_cleanup",
 ]
 AUTH_USER_MODEL = "main.User"
 
@@ -117,3 +118,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT='media'

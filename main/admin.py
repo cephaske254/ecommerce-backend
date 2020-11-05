@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import accounts
+from .models import User,Product, ProductImage
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -46,4 +46,13 @@ class UserAdmin(DefaultUserAdmin):
     search_fields = ("full_name", "email")
 
 
-admin.site.register(accounts.User, UserAdmin)
+class ProductImageAdmin(admin.StackedInline):
+    model = ProductImage
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['slug','name','id', 'images_count']
+    inlines = [ProductImageAdmin]
+
+admin.site.register(User, UserAdmin)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(ProductImage)

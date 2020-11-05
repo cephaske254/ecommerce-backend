@@ -9,7 +9,6 @@ from main.utils import verification_token
 
 class User(AbstractUser):
     objects = accounts.UserManager()
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.email:
