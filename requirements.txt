@@ -27,6 +27,7 @@ pep517==0.8.2
 progress==1.5
 pynliner==0.8.0
 pyparsing==2.4.6
+python-decouple==3.3
 pytoml==0.1.21
 pytz==2020.4
 regex==2020.10.28
