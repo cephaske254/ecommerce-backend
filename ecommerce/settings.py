@@ -1,18 +1,30 @@
-import os
 from pathlib import Path
-from decouple import config
-# from django.core.mail.backends.console.EmailBackend
+from decouple import config, Csv
+from datetime import timedelta
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "0f7ynp2mp5!$3xv*%5hiwda8@k0n4ix3=me=j^ipbxznxq#dvq"
+SECRET_KEY = config("SECRET_KEY")
+
 DEBUG = True
-ALLOWED_HOSTS = []
 
+# ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
+ALLOWED_HOSTS = ["*"]
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+}
 
-# CUSTOMIZATION
-
-REST_FRAMEWORK = {}
+REST_FRAMEWORK = {
+    "NON_FIELD_ERRORS_KEY": "other",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "utils.pagination.CustomPagination",
+    "PAGE_SIZE": 100,
+}
+# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -21,24 +33,24 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "main.apps.MainConfig",
-    "accounts.apps.AccountsConfig",
-    "django_inlinecss",
+    # packages
+    "corsheaders",
     "rest_framework",
     "django_cleanup",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    # apps
+    "checkout",
+    "accounts",
+    "inventory",
+    "search",
 ]
-AUTH_USER_MODEL = "main.User"
+AUTH_USER_MODEL = "accounts.User"
 
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_PORT = config("EMAIL_PORT", cast=int)
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-SERVER_EMAIL = EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+CORS_ALLOW_ALL_ORIGINS = True
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -117,7 +129,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT='media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "media"
