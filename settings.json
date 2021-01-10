@@ -1,0 +1,10 @@
+{
+    "default_page_size": 30,
+    "theme": "dark",
+    "default_currency_code": "KES",
+    "usd_to_default": 109,
+    "notifications": {
+        "order": true,
+        "out_of_stock": true
+    }
+}
