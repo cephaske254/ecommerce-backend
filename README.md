@@ -3,7 +3,7 @@ Ecommerce  Backend Template with Python Django and Django Rest Framework
 
 ## This app is a backend REST API for
   1. [Ecommerce Admin Panel](https://github.com/cephaske254/ecommerce_admin) (Vue Js)
-  2. [Ecommerce Client Site](https://github.com/cephaske254/ecommerce-front) (React Js)
+  2. [Ecommerce Client Site](https://github.com/cephaske254/ecomerce-frontend) (React Js)
  
  
 ## Getting Started
