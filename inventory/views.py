@@ -3,6 +3,7 @@ from rest_framework import generics, response, status
 from . import serializers
 from . import models
 from .utils import setCategories, saveImages, removeImages, addBrand
+from rest_framework import filters
 
 
 class ProductListCreate(generics.ListCreateAPIView):
@@ -16,13 +17,13 @@ class ProductListCreate(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         category_data = self.request.data.get("categories")
         brand_data = self.request.data.get("brand")
-        data = {}   
+        data = {}
         data["brand"] = addBrand(brand_data)
 
         product = serializer.save(**data)
 
-        addBrand(request, product)
-        setCategories(request, product)
+        addBrand(brand_data)
+        setCategories(self.request, product)
         saveImages(self.request, product)
 
 
@@ -53,8 +54,15 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
 class CategoryListCreate(generics.ListCreateAPIView):
     serializer_class = serializers.CategorySerializer
     queryset = models.Category.objects.all()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
 
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.CategoryDetailSerializer
     queryset = models.Category.objects.all()
+    lookup_field = "slug"
+
+    def put(self, request, *args, **kwargs):
+        self.serializer_class = serializers.CategorySerializer
+        return super().put(request, *args, **kwargs)

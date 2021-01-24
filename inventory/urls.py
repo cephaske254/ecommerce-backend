@@ -8,6 +8,6 @@ urlpatterns = [
         "categories/", views.CategoryListCreate.as_view(), name="categories_list_create"
     ),
     path(
-        "categories/<pk>/", views.CategoryDetail.as_view(), name="categories_detail"
+        "categories/<slug>/", views.CategoryDetail.as_view(), name="categories_detail"
     ),
 ]

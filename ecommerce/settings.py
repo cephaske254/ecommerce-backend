@@ -17,14 +17,21 @@ SIMPLE_JWT = {
 
 REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "other",
+    "DATETIME_FORMAT": "%B %d, %Y",
+    "SEARCH_PARAM": "q",
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
     ),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
+    ],
     "DEFAULT_PAGINATION_CLASS": "utils.pagination.CustomPagination",
-    "PAGE_SIZE": 100,
+    "PAGE_SIZE": 40,
 }
 # Application definition
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -39,15 +46,20 @@ INSTALLED_APPS = [
     "django_cleanup",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "django_filters",
+    "django_rest_passwordreset",
     # apps
     "checkout",
     "accounts",
     "inventory",
     "search",
 ]
+
 AUTH_USER_MODEL = "accounts.User"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 CORS_ALLOW_ALL_ORIGINS = True
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

@@ -16,9 +16,16 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    product_count = serializers.CharField(read_only=True)
+
     class Meta:
         model = models.Category
         fields = "__all__"
+
+    def validate_name(self, data):
+        if models.Category.objects.filter(name__iexact=data.strip()).exists():
+            raise serializers.ValidationError("This category already exists!")
+        return data
 
 
 class CategorySerializerMini(CategorySerializer):

@@ -12,26 +12,45 @@ class Category(models.Model):
     """
 
     name = models.CharField(max_length=200, blank=False, null=False, unique=True)
+    slug = models.SlugField(unique=True, null=True, editable=False, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def product_count(self):
+        return self.products.count()
 
     class Meta:
         verbose_name_plural = "categories"
-        ordering = ["-pk", "name"]
+        ordering = ["pk", "name"]
 
     def __str__(self):
         return self.name
 
+    @classmethod
+    def make_slug(cls, name):
+        slug = slugify(name, allow_unicode=False)
+        letters = string.ascii_letters + string.digits
+
+        while cls.objects.filter(slug=slug).exists():
+            slug = slugify(
+                name + "-" + "".join(random.choices(letters, k=6)), allow_unicode=False
+            )
+        return slug
+
     @property
     def products(self):
-        return Product.objects.filter(category=self.pk).all()
+        return Product.objects.filter(categories=self.pk).all()
 
     def save(self, *args, **kwargs):
         self.name = self.name.title() if self.name else self.name
+        self.slug = self.make_slug(self.name)
         super().save(*args, **kwargs)
 
 
 class Brand(models.Model):
     name = models.CharField(max_length=200, unique=True, primary_key=True)
     icon = models.ImageField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -74,7 +93,8 @@ class Product(models.Model):
     def price(self):
         if self.discount_price and float(self.discount_price) > 0:
             return self.discount_price
-        else:return self.market_price
+        else:
+            return self.market_price
 
     @property
     def image(self):
