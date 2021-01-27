@@ -10,4 +10,6 @@ urlpatterns = [
     path(
         "categories/<slug>/", views.CategoryDetail.as_view(), name="categories_detail"
     ),
+    path("banner_ads/", views.BannerAdListCreate.as_view(), name="banner_ads_list_create"),
+    path("banner_ads/<slug>/", views.BannerAdsDetail.as_view(), name="banner_ads_list_create"),
 ]

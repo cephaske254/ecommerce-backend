@@ -3,15 +3,13 @@ from django.core.files.base import ContentFile
 from . import models
 
 
-def buildImage(data, product_name):
+def buildImage(data, name):
     format, imgstr = data.split(";base64,")
     ext = format.split("/")[-1]
-    return ContentFile(
-        base64.b64decode(imgstr), name=str(product_name).strip() + "." + ext
-    )
+    return ContentFile(base64.b64decode(imgstr), name=str(name).strip() + "." + ext)
 
 
-def saveImages(request, product):
+def saveProductImages(request, product):
     images = request.data.get("images")
     name = request.data.get("name")
     if images:
@@ -33,12 +31,12 @@ def saveImages(request, product):
             )
 
 
-def removeImages(request):
+def removeProductImages(request):
     removedImages = request.data.get("removedImages", [])
     images = models.Image.objects.filter(id__in=removedImages).all().delete()
 
 
-def setCategories(request, product):
+def setProductCategories(request, product):
     categories = [(ctg.lower()) for ctg in request.data.get("categories")]
     existing = [(ctg.name.lower()) for ctg in product.categories.all()]
 
@@ -74,14 +72,21 @@ def removeCategories(product, categories):
                 return
             product.categories.remove(category)
 
-def addBrand(brand_data):
-        if brand_data:
-            try:
-                brand = models.Brand.objects.get(pk=brand_data)
-            except:
-                brand = models.Brand.objects.filter(name__iexact=brand_data).first()
-                brand = (
-                    models.Brand.objects.create(name=brand_data) if not brand else brand
-                )
-            return brand
-        return None
+
+def addProductBrand(brand_data):
+    if brand_data:
+        try:
+            brand = models.Brand.objects.get(pk=brand_data)
+        except:
+            brand = models.Brand.objects.filter(name__iexact=brand_data).first()
+            brand = models.Brand.objects.create(name=brand_data) if not brand else brand
+        return brand
+    return None
+
+
+def saveBannerAdsImage(request, banner):
+    image = request.data.get("image")
+    name = request.data.get("name")
+
+    banner.image = buildImage(image, name)
+    banner.save()

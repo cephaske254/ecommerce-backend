@@ -106,3 +106,22 @@ class ProductListCreate(serializers.ModelSerializer):
 
     def update(self, validated_data, *args, **kwargs):
         return super().update(validated_data, *args, **kwargs)
+
+
+class BannerAdSerializer(serializers.ModelSerializer):
+    """
+    Fields:
+        title, slug, product, active, url, @link
+    """
+
+    class Meta:
+        model = models.BannerAd
+        fields = ["title", "slug", "product", "description", "image", "active", "link"]
+        extra_kwargs = {"image": {"read_only": True}}
+
+    def validate(self, data):
+        # if not data.get("image") and not data.get("url"):
+        #     raise serializers.ValidationError(
+        #         "Referenced product or exrernal url is required"
+        #     )
+        return super().validate(data)

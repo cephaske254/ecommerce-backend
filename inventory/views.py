@@ -2,7 +2,13 @@ from django.shortcuts import render
 from rest_framework import generics, response, status
 from . import serializers
 from . import models
-from .utils import setCategories, saveImages, removeImages, addBrand
+from .utils import (
+    setProductCategories,
+    saveProductImages,
+    removeProductImages,
+    addProductBrand,
+    buildImage,
+)
 from rest_framework import filters
 
 
@@ -18,13 +24,13 @@ class ProductListCreate(generics.ListCreateAPIView):
         category_data = self.request.data.get("categories")
         brand_data = self.request.data.get("brand")
         data = {}
-        data["brand"] = addBrand(brand_data)
+        data["brand"] = addProductBrand(brand_data)
 
         product = serializer.save(**data)
 
-        addBrand(brand_data)
-        setCategories(self.request, product)
-        saveImages(self.request, product)
+        addProductBrand(brand_data)
+        setProductCategories(self.request, product)
+        saveProductImages(self.request, product)
 
 
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -35,13 +41,13 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         brand_data = self.request.data.get("brand")
         data = {}
-        data["brand"] = addBrand(brand_data)
+        data["brand"] = addProductBrand(brand_data)
 
         product = serializer.save(**data)
 
-        saveImages(self.request, product)
-        setCategories(self.request, product)
-        removeImages(self.request)
+        saveProductImages(self.request, product)
+        setProductCategories(self.request, product)
+        removeProductImages(self.request)
 
     def _allowed_methods(self):
         return [
@@ -66,3 +72,30 @@ class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         self.serializer_class = serializers.CategorySerializer
         return super().put(request, *args, **kwargs)
+
+
+class BannerAdListCreate(generics.ListCreateAPIView):
+    serializer_class = serializers.BannerAdSerializer
+
+    def perform_create(self, serializer):
+        image = self.request.data.get("image", None)
+        fileImage = self.request.FILES.get("image", None)
+
+        if not fileImage and image is not None:
+            serializer.validated_data["image"] = buildImage(
+                image, "banner_%s" % self.request.get("title")
+            )
+        else:
+            serializer.save(image=fileImage)
+
+    def get_queryset(self):
+        queryset = models.BannerAd.objects
+
+        if self.request.user.is_authenticated and self.request.user.has_perms:
+            return queryset.all()
+        return queryset.filter(active=True)
+
+
+class BannerAdsDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.BannerAdSerializer
+    queryset = models.BannerAd.objects.all()

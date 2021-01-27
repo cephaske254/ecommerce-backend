@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 import random, string
 from django.utils import timezone
+from django.urls import reverse
 
 # Create your models here.
 
@@ -107,6 +108,10 @@ class Product(models.Model):
     def image_count(self):
         return self.images.all().count()
 
+    @property
+    def url(self):
+        return reverse("products_detail", kwargs={"slug": self.slug})
+
     @classmethod
     def make_slug(cls, name):
         slug = slugify(name, allow_unicode=False)
@@ -134,3 +139,41 @@ class deal(models.Model):
     start = models.DateTimeField(null=True, blank=True, default=timezone.now)
     end = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
+
+
+class BannerAd(models.Model):
+    title = models.CharField(max_length=200, blank=False, null=False)
+    slug = models.CharField(max_length=200, editable=False)
+    product = models.ForeignKey(Product, models.CASCADE, null=True, blank=True)
+    active = models.BooleanField(default=True, blank=False, null=False)
+    url = models.URLField(blank=True, null=True)
+    image = models.ImageField(upload_to="banner_ads", blank=False, null=True)
+    description = models.CharField(max_length=200, null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self.make_slug(self.title)
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def make_slug(cls, name):
+        slug = slugify(name, allow_unicode=False)
+        letters = string.ascii_letters + string.digits
+
+        while cls.objects.filter(slug=slug).exists():
+            slug = slugify(
+                name + "-" + "".join(random.choices(letters, k=6)), allow_unicode=False
+            )
+        return slug
+
+    @property
+    def link(self):
+        if self.product:
+            return self.product.url
+        elif self.url:
+            return self.url
+        return None
+
+    class Meta:
+        ordering = ["-pk", "date", "title"]
