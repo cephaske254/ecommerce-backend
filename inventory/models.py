@@ -3,6 +3,8 @@ from django.utils.text import slugify
 import random, string
 from django.utils import timezone
 from django.urls import reverse
+from django.core.validators import ValidationError
+from django.utils.text import gettext_lazy as _
 
 # Create your models here.
 
@@ -146,8 +148,9 @@ class BannerAd(models.Model):
     slug = models.CharField(max_length=200, editable=False)
     product = models.ForeignKey(Product, models.CASCADE, null=True, blank=True)
     active = models.BooleanField(default=True, blank=False, null=False)
+    show_prices = models.BooleanField(default=True, blank=False, null=False)
     url = models.URLField(blank=True, null=True)
-    image = models.ImageField(upload_to="banner_ads", blank=False, null=True)
+    image = models.ImageField(upload_to="banners", blank=False, null=True)
     description = models.CharField(max_length=200, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
 

@@ -5,6 +5,8 @@ from rest_framework_simplejwt.views import (
 )
 from . import views
 from rest_framework import routers
+from django_rest_passwordreset import urls
+
 
 urlpatterns = [
     path("register/", views.Register.as_view(), name="register"),

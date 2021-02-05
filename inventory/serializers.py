@@ -64,6 +64,14 @@ class ProductListMini(serializers.ModelSerializer):
         return None
 
 
+class ProductDetailSerializerMini(ProductListMini):
+    class Meta(ProductListMini.Meta):
+        fields = [
+            "slug",
+            "name",
+        ]
+
+
 class CategoryDetailSerializer(serializers.ModelSerializer):
     products = ProductListMini(read_only=True, many=True)
 
@@ -109,6 +117,7 @@ class ProductListCreate(serializers.ModelSerializer):
 
 
 class BannerAdSerializer(serializers.ModelSerializer):
+    product = ProductListMini(read_only=True)
     """
     Fields:
         title, slug, product, active, url, @link
@@ -116,12 +125,17 @@ class BannerAdSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.BannerAd
-        fields = ["title", "slug", "product", "description", "image", "active", "link"]
+        fields = ["title", "slug", "product", "image", "active", "show_prices"]
         extra_kwargs = {"image": {"read_only": True}}
 
     def validate(self, data):
-        # if not data.get("image") and not data.get("url"):
-        #     raise serializers.ValidationError(
-        #         "Referenced product or exrernal url is required"
-        #     )
+        request = self.context.get("request").data
+        errors = []
+        # if not request.get("image"):
+        #     errors.append("Image is required!")
+        if not request.get("product"):
+            errors.append("Product is required!")
+        if errors:
+            raise serializers.ValidationError(errors)
+
         return super().validate(data)

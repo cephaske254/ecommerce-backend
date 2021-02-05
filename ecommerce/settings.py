@@ -30,6 +30,18 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "utils.pagination.CustomPagination",
     "PAGE_SIZE": 40,
 }
+
+
+# EMAIL
+EMAIL_PORT = 587
+EMAIL_HOST = "mail.uxinfiniti.com"
+EMAIL_HOST_USER = "developers@uxinfiniti.com"
+EMAIL_HOST_PASSWORD = "AllowMe!01"
+DEFAULT_FROM_EMAIL = "Developers"
+EMAIL_USE_TLS = True
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 # Application definition
 
 
@@ -56,7 +68,6 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = "accounts.User"
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -128,7 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Africa/Nairobi"
 
 USE_I18N = True
 
