@@ -125,9 +125,11 @@ class BannerAdsDetail(generics.RetrieveUpdateDestroyAPIView, BannerAdListCreate)
 
         serialize = serializers.ProductListMini(product)
         serialize.context["request"] = request
+
         data = {
             **self.get_serializer(banner_ad).data,
             "vacant": False if banner_ad else True,
+            "product": serialize.data,
         }
 
         return response.Response(data=data)
@@ -172,4 +174,4 @@ class visitorIn(views.APIView):
         thread = threading.Thread(target=self.mail)
         thread.run()
 
-        return response.Response(data={})
+        return response.Response(data={"status": "OK"})

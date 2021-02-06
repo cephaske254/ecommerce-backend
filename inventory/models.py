@@ -146,7 +146,9 @@ class deal(models.Model):
 class BannerAd(models.Model):
     title = models.CharField(max_length=200, blank=False, null=False)
     slug = models.CharField(max_length=200, editable=False)
-    product = models.ForeignKey(Product, models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(
+        Product, models.CASCADE, null=True, blank=True, related_name="banner_ad"
+    )
     active = models.BooleanField(default=True, blank=False, null=False)
     show_prices = models.BooleanField(default=True, blank=False, null=False)
     url = models.URLField(blank=True, null=True)

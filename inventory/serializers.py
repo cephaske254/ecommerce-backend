@@ -35,7 +35,7 @@ class CategorySerializerMini(CategorySerializer):
 
 class ProductListMini(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    # price = serializers.CharField(read_only=True)
+    has_banner_ad = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Product
@@ -48,6 +48,7 @@ class ProductListMini(serializers.ModelSerializer):
             "discount_price",
             "image",
             "image_count",
+            "has_banner_ad",
         )
 
         extra_kwargs = {"price": {"read_only": True}}
@@ -62,6 +63,9 @@ class ProductListMini(serializers.ModelSerializer):
         if image:
             return is_secure + host_name + image
         return None
+
+    def get_has_banner_ad(self, obj):
+        return obj.banner_ad.exists()
 
 
 class ProductDetailSerializerMini(ProductListMini):
@@ -109,8 +113,6 @@ class ProductListCreate(serializers.ModelSerializer):
         objects = obj.categories.all()
         data = [(category.name) for category in objects]
         return data
-
-        # return data
 
     def update(self, validated_data, *args, **kwargs):
         return super().update(validated_data, *args, **kwargs)

@@ -12,8 +12,11 @@ distro==1.4.0
 Django==3.1.4
 django-cleanup==5.1.0
 django-cors-headers==3.6.0
+django-filter==2.4.0
+django-rest-passwordreset==1.1.0
 djangorestframework==3.12.2
 djangorestframework-simplejwt==4.6.0
+drf-reset-password==1.2.8
 html5lib==1.0.1
 idna==2.8
 ipaddr==2.2.0

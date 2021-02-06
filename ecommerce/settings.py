@@ -33,14 +33,14 @@ REST_FRAMEWORK = {
 
 
 # EMAIL
-EMAIL_PORT = 587
-EMAIL_HOST = "mail.uxinfiniti.com"
-EMAIL_HOST_USER = "developers@uxinfiniti.com"
-EMAIL_HOST_PASSWORD = "AllowMe!01"
-DEFAULT_FROM_EMAIL = "Developers"
-EMAIL_USE_TLS = True
+EMAIL_PORT = config("EMAIL_PORT", 587)
+EMAIL_HOST = config("EMAIL_HOST", None)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", None)
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", None)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", None)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", True)
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Application definition
 
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "accounts",
     "inventory",
     "search",
+    "main",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
