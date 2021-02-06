@@ -31,6 +31,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 40,
 }
 
+if DEBUG == False:
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
+        "rest_framework.renderers.JSONRenderer"
+    ]
+
 
 # EMAIL
 EMAIL_PORT = config("EMAIL_PORT", 587)
