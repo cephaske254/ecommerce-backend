@@ -213,10 +213,15 @@ class BannerAd(models.Model):
             self.slug = self.make_slug(self.title)
 
         if not self.order:
-            last_banner = BannerAd.objects.order_by("-order", "title").first().order
-            self.order = last_banner + 1 if last_banner else None
+            last_banner = BannerAd.objects.order_by("-order", "title").first()
+            if last_banner and last_banner.order:
+                self.order = last_banner.order + 1
 
-        self.make_thumbnail(self.pk, self.image)
+        image = self.image
+        if self.pk:
+            self.make_thumbnail(self.pk, self.image)
+        else:
+            self.thumbnail.save(**MakeThumb(self.image))
         super().save(*args, **kwargs)
 
     @classmethod
