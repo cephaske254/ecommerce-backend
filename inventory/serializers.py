@@ -137,7 +137,11 @@ class BannerAdSerializer(serializers.ModelSerializer):
             "order",
             "thumbnail",
         ]
-        extra_kwargs = {"image": {"read_only": True}, "order": {"read_only": True}}
+        extra_kwargs = {
+            "image": {"read_only": True},
+            "order": {"read_only": True},
+            "thumbnail": {"read_only": True},
+        }
 
     def validate(self, data):
         request = self.context.get("request").data

@@ -14,6 +14,42 @@ import os.path
 from PIL import Image
 
 
+def MakeThumb(instance, thubm_size=((400, 400))):
+    img = image.open(instance)
+    img.thumbnail(thubm_size, image.ANTIALIAS)
+
+    thumb_name, thumb_extension = os.path.splitext(instance.name)
+    thumb_extension = thumb_extension.lower()
+
+    thumb_filename = thumb_name + thumb_extension
+
+    if thumb_extension in [".jpg", ".jpeg"]:
+        FTYPE = "JPEG"
+    elif thumb_extension == ".gif":
+        FTYPE = "GIF"
+    elif thumb_extension == ".png":
+        FTYPE = "PNG"
+    else:
+        return False  # Unrecognized file type
+
+    # Save thumbnail to in-memory file as StringIO
+    temp_thumb = BytesIO()
+    img.save(temp_thumb, FTYPE)
+    temp_thumb.seek(0)
+
+    # set save=False, otherwise it will run in an infinite loop
+    data = {
+        "name": thumb_filename,
+        "content": ContentFile(temp_thumb.read()),
+        "save": False,
+    }
+    temp_thumb.close()
+
+    return data
+
+    return True
+
+
 class Category(models.Model):
     """
     name, @products
@@ -52,6 +88,7 @@ class Category(models.Model):
     def save(self, *args, **kwargs):
         self.name = self.name.title() if self.name else self.name
         self.slug = self.make_slug(self.name)
+
         super().save(*args, **kwargs)
 
 
@@ -149,6 +186,12 @@ class deal(models.Model):
 
 
 class BannerAd(models.Model):
+    __original_image_name = None
+
+    def __init__(self, *args, **kwargs):
+        super(BannerAd, self).__init__(*args, **kwargs)
+        self.__original_image_name = self.image.name
+
     title = models.CharField(max_length=200, blank=False, null=False)
     slug = models.CharField(max_length=200, editable=False)
     product = models.ForeignKey(
@@ -173,39 +216,15 @@ class BannerAd(models.Model):
             last_banner = BannerAd.objects.order_by("-order", "title").first().order
             self.order = last_banner + 1 if last_banner else None
 
-        self.make_thumbnail()
-
+        self.make_thumbnail(self.pk, self.image)
         super().save(*args, **kwargs)
 
-    def make_thumbnail(self):
-        THUMB_SIZE = (250, 250)
-        img = image.open(self.image.path)
-        img.thumbnail(THUMB_SIZE, image.ANTIALIAS)
-
-        thumb_name, thumb_extension = os.path.splitext(self.image.name)
-        thumb_extension = thumb_extension.lower()
-
-        thumb_filename = thumb_name + thumb_extension
-
-        if thumb_extension in [".jpg", ".jpeg"]:
-            FTYPE = "JPEG"
-        elif thumb_extension == ".gif":
-            FTYPE = "GIF"
-        elif thumb_extension == ".png":
-            FTYPE = "PNG"
-        else:
-            return False  # Unrecognized file type
-
-        # Save thumbnail to in-memory file as StringIO
-        temp_thumb = BytesIO()
-        img.save(temp_thumb, FTYPE)
-        temp_thumb.seek(0)
-
-        # set save=False, otherwise it will run in an infinite loop
-        self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=False)
-        temp_thumb.close()
-
-        return True
+    @classmethod
+    def make_thumbnail(cls, pk, image):
+        instance = cls.objects.get(pk=pk)
+        if instance.image != image:
+            instance.thumbnail.save(**MakeThumb(instance.image))
+        return None
 
     @classmethod
     def make_slug(cls, name):
