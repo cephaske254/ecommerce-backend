@@ -127,8 +127,17 @@ class BannerAdSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.BannerAd
-        fields = ["title", "slug", "product", "image", "active", "show_prices"]
-        extra_kwargs = {"image": {"read_only": True}}
+        fields = [
+            "title",
+            "slug",
+            "product",
+            "image",
+            "active",
+            "show_prices",
+            "order",
+            "thumbnail",
+        ]
+        extra_kwargs = {"image": {"read_only": True}, "order": {"read_only": True}}
 
     def validate(self, data):
         request = self.context.get("request").data

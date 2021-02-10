@@ -12,7 +12,7 @@ from .utils import (
 from rest_framework import filters
 import datetime
 from django.core.mail import send_mail
-import threading
+import threading, json
 
 
 class TopProducts(generics.ListAPIView):
@@ -137,25 +137,46 @@ class BannerAdsDetail(generics.RetrieveUpdateDestroyAPIView, BannerAdListCreate)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
-        banner = self.queryset.filter(
-            product__slug=self.request.data.get("product", {}).get("slug")
-        )
+        banner = self.queryset.filter(product__slug=self.slug).first()
 
         if banner:
             return super().update(request, *args, **kwargs)
 
         return super().create(self, request, *args, **kwargs)
 
-    def perform_update(self, serializer):
+    def patch(self, request, *args, **kwargs):
+        banner = self.get_object()
         image = self.request.data.get("image", None)
         fileImage = self.request.FILES.get("image", None)
 
         if not fileImage and image is not None:
-            serializer.save(
-                image=buildImage(image, "banner_%s" % self.request.data.get("title")),
+            banner.image = buildImage(
+                image, "banner_%s" % self.request.data.get("title")
             )
-        else:
-            serializer.save()
+            banner.save()
+
+        serializer = self.serializer_class(banner)
+        serializer.context["request"] = request
+
+        return super().patch(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.patch(request, *args, **kwargs)
+
+
+class BannerAdsReOrder(views.APIView):
+    queryset = models.BannerAd.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        print(data)
+
+        if data and data is not None:
+            for i in data:
+                banner = models.BannerAd.objects.filter(slug=i.get("slug")).first()
+                banner.order = i.get("order")
+                banner.save()
+        return response.Response(data={"status": "OK"})
 
 
 class visitorIn(views.APIView):

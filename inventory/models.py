@@ -5,8 +5,13 @@ from django.utils import timezone
 from django.urls import reverse
 from django.core.validators import ValidationError
 from django.utils.text import gettext_lazy as _
+from PIL import Image as image
+from io import StringIO, BytesIO
+from django.core.files.base import ContentFile
+import os.path
 
 # Create your models here.
+from PIL import Image
 
 
 class Category(models.Model):
@@ -153,13 +158,54 @@ class BannerAd(models.Model):
     show_prices = models.BooleanField(default=True, blank=False, null=False)
     url = models.URLField(blank=True, null=True)
     image = models.ImageField(upload_to="banners", blank=False, null=True)
+    thumbnail = models.ImageField(
+        upload_to="banners/thumbnails/", blank=False, null=True
+    )
     description = models.CharField(max_length=200, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
+    order = models.IntegerField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = self.make_slug(self.title)
+
+        if not self.order:
+            last_banner = BannerAd.objects.order_by("-order", "title").first().order
+            self.order = last_banner + 1 if last_banner else None
+
+        self.make_thumbnail()
+
         super().save(*args, **kwargs)
+
+    def make_thumbnail(self):
+        THUMB_SIZE = (250, 250)
+        img = image.open(self.image.path)
+        img.thumbnail(THUMB_SIZE, image.ANTIALIAS)
+
+        thumb_name, thumb_extension = os.path.splitext(self.image.name)
+        thumb_extension = thumb_extension.lower()
+
+        thumb_filename = thumb_name + thumb_extension
+
+        if thumb_extension in [".jpg", ".jpeg"]:
+            FTYPE = "JPEG"
+        elif thumb_extension == ".gif":
+            FTYPE = "GIF"
+        elif thumb_extension == ".png":
+            FTYPE = "PNG"
+        else:
+            return False  # Unrecognized file type
+
+        # Save thumbnail to in-memory file as StringIO
+        temp_thumb = BytesIO()
+        img.save(temp_thumb, FTYPE)
+        temp_thumb.seek(0)
+
+        # set save=False, otherwise it will run in an infinite loop
+        self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=False)
+        temp_thumb.close()
+
+        return True
 
     @classmethod
     def make_slug(cls, name):
@@ -181,4 +227,4 @@ class BannerAd(models.Model):
         return None
 
     class Meta:
-        ordering = ["-pk", "date", "title"]
+        ordering = ["order", "title"]

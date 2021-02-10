@@ -12,15 +12,6 @@ SetEnv EMAIL_HOST_PASSWORD AllowMe!01
 SetEnv EMAIL_HOST_USER developers@uxinfiniti.com
 SetEnv EMAIL_USE_TLS True
 SetEnv SECRET_KEY m(z=%0s*+e&3ikj4^_%ird44!-solk_d4pm%%2s3nx1l0ckm6d
-SetEnv DEBUG False
-</IfModule>
-
-<IfModule mod_setenvif.c>
-  <IfModule mod_headers.c>
-    <FilesMatch "\.(bmp|cur|gif|ico|jpe?g|png|svgz?|webp|avifs?)$">
-      SetEnvIf Origin ":" IS_CORS
-      Header set Access-Control-Allow-Origin "*" env=IS_CORS
-    </FilesMatch>
-  </IfModule>
+SetEnv DEBUG True
 </IfModule>
 # DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END
