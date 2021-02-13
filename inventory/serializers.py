@@ -35,7 +35,6 @@ class CategorySerializerMini(CategorySerializer):
 
 class ProductListMini(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    has_banner_ad = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Product
@@ -64,8 +63,6 @@ class ProductListMini(serializers.ModelSerializer):
             return is_secure + host_name + image
         return None
 
-    def get_has_banner_ad(self, obj):
-        return obj.banner_ad.exists()
 
 
 class ProductDetailSerializerMini(ProductListMini):

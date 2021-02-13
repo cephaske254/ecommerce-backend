@@ -169,7 +169,6 @@ class BannerAdsReOrder(views.APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        print(data)
 
         if data and data is not None:
             for i in data:

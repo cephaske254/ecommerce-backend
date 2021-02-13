@@ -156,6 +156,12 @@ class Product(models.Model):
     def url(self):
         return reverse("products_detail", kwargs={"slug": self.slug})
 
+    @property
+    def has_banner_ad(self):
+        if self.banner_ad:
+            return True
+        return False
+
     @classmethod
     def make_slug(cls, name):
         slug = slugify(name, allow_unicode=False)
@@ -194,7 +200,7 @@ class BannerAd(models.Model):
 
     title = models.CharField(max_length=200, blank=False, null=False)
     slug = models.CharField(max_length=200, editable=False)
-    product = models.ForeignKey(
+    product = models.OneToOneField(
         Product, models.CASCADE, null=True, blank=True, related_name="banner_ad"
     )
     active = models.BooleanField(default=True, blank=False, null=False)
